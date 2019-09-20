@@ -248,9 +248,11 @@ $ServerConfigClass$::~$ServerConfigClass$() {
 bool $ServerConfigClass$::Read(const char *config_file) {
     bool ret{ep_server_config_.Read(config_file)};
 
+    /*
     if (0 == strlen(ep_server_config_.GetPackageName())) {
         ep_server_config_.SetPackageName($PackageNameExpression$);
     }
+    */
 
     return ret;
 }
