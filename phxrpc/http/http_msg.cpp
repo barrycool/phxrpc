@@ -52,8 +52,22 @@ int HttpMessage::ToPb(google::protobuf::Message *const message) const {
 
     return 0;
 }
+    
+int HttpMessage::ToPb(google::protobuf::MessageLite *const message) const {
+    if (!message->ParseFromString(content()))
+        return -1;
+
+    return 0;
+}
 
 int HttpMessage::FromPb(const google::protobuf::Message &message) {
+    if (!message.SerializeToString(mutable_content()))
+        return -1;
+
+    return 0;
+}
+    
+int HttpMessage::FromPb(const google::protobuf::MessageLite &message) {
     if (!message.SerializeToString(mutable_content()))
         return -1;
 
