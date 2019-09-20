@@ -10,4 +10,9 @@
 third_party/*
 sbin/*
 sample/*
+codegen/phxrpc_pb2client
+codegen/phxrpc_pb2server
+codegen/phxrpc_pb2service
+codegen/phxrpc_pb2tool
+codegen/test_proto_utils
 
