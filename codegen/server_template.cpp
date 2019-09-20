@@ -320,7 +320,7 @@ SocketTimeoutMS = 5000
 const char *PHXRPC_SERVER_MAKEFILE_TEMPLATE =
         R"(
 
-include $PhxRPCMKDir$/phxrpc.mk
+include $PhxRPCMKDir$/phxrpc-lite.mk
 
 LDFLAGS := -L$(PHXRPC_ROOT)/lib -lphxrpc $(LDFLAGS)
 
