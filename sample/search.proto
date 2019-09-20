@@ -2,10 +2,11 @@ syntax = "proto3";
 
 package search;
 
-import "google/protobuf/wrappers.proto";
-import "google/protobuf/empty.proto";
-
+import "phxrpc/rpc/wrappers.proto";
+import "phxrpc/rpc/empty.proto";
 import "phxrpc/rpc/phxrpc.proto";
+
+option optimize_for = LITE_RUNTIME;
 
 
 enum SiteType {
@@ -38,7 +39,7 @@ service Search {
         option(phxrpc.Usage) = "-q <query>";
     }
 
-    rpc Notify(google.protobuf.StringValue) returns (google.protobuf.Empty) {
+    rpc Notify(phxrpc.StringValue) returns (phxrpc.Empty) {
         option(phxrpc.CmdID) = 2;
         option(phxrpc.OptString) = "m:";
         option(phxrpc.Usage) = "-m <msg>";

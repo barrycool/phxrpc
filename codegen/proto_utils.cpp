@@ -163,7 +163,7 @@ int ProtoUtils::LoadExtension(const char *file_name, SyntaxTree *stree, DiskSour
 int ProtoUtils::AddEcho(SyntaxTree *stree) {
     char name[256]{0};
 
-    snprintf(name, sizeof(name), "google.protobuf.StringValue");
+    snprintf(name, sizeof(name), "phxrpc.StringValue");
 
     // always add a echo function
     {

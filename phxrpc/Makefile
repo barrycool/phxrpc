@@ -11,7 +11,7 @@ LIB_NETWORK_OBJS = network/socket_stream_base.o network/uthread_runtime.o \
 
 LIB_FILE_OBJS = file/log_utils.o file/file_utils.o file/opt_map.o file/config.o
 
-LIB_RPC_OBJS = rpc/phxrpc.pb.o rpc/caller.o \
+LIB_RPC_OBJS = rpc/phxrpc.pb.o rpc/empty.pb.o rpc/wrappers.pb.o rpc/caller.o \
 		rpc/server_config.o rpc/client_config.o rpc/socket_stream_phxrpc.o \
 		rpc/uthread_caller.o rpc/client_monitor.o rpc/server_monitor.o \
 		rpc/monitor_factory.o rpc/hsha_server.o rpc/server_base.o
@@ -42,6 +42,15 @@ rpc/phxrpc.pb.cc: rpc/phxrpc.pb.h
 rpc/phxrpc.pb.h: rpc/phxrpc.proto
 	cd ..; $(PROTOBUF_ROOT)/bin/protoc -I$(PROTOBUF_ROOT)/src -I. --cpp_out=. phxrpc/$<;
 
+rpc/empty.pb.cc: rpc/empty.pb.h
+
+rpc/empty.pb.h: rpc/empty.proto
+	cd ..; $(PROTOBUF_ROOT)/bin/protoc -I$(PROTOBUF_ROOT)/src -I. --cpp_out=. phxrpc/$<;
+
+rpc/wrappers.pb.cc: rpc/wrappers.pb.h
+
+rpc/wrappers.pb.h: rpc/wrappers.proto
+	cd ..; $(PROTOBUF_ROOT)/bin/protoc -I$(PROTOBUF_ROOT)/src -I. --cpp_out=. phxrpc/$<;
 clean:
 	@( $(RM) $(TARGETS) $(TEST_TARGETS) )
 	@( $(RM) *.o core.* $(LIB_OBJS) )
