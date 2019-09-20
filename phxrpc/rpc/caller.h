@@ -44,6 +44,9 @@ class Caller {
 
     int Call(const google::protobuf::Message &req,
              google::protobuf::Message *resp);
+  
+    int Call(const google::protobuf::MessageLite &req,
+             google::protobuf::MessageLite *resp);
 
     void set_uri(const char *const uri, const int cmd_id);
 
