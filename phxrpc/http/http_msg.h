@@ -53,7 +53,9 @@ class HttpMessage : virtual public BaseMessage {
     virtual ~HttpMessage() override = default;
 
     virtual int ToPb(google::protobuf::Message *const message) const override;
+    virtual int ToPb(google::protobuf::MessageLite *const message) const override;
     virtual int FromPb(const google::protobuf::Message &message) override;
+    virtual int FromPb(const google::protobuf::MessageLite &message) override;
     virtual size_t size() const override;
 
     void AddHeader(const char *name, const char *value);
