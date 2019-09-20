@@ -38,7 +38,7 @@ CFLAGS = -std=c++11 -Wall -D_REENTRANT -D_GNU_SOURCE -D_XOPEN_SOURCE -fPIC -m64 
 		-I$(PROTOBUF_ROOT)/include \
 		-I$(PHXRPC_ROOT)
 
-LDFLAGS = -L$(PROTOBUF_ROOT)/lib/ $(PROTOBUF_ROOT)/lib/libprotobuf.a \
+LDFLAGS = -L$(PROTOBUF_ROOT)/lib/ $(PROTOBUF_ROOT)/lib/libprotobuf-lite.a \
 		-lstdc++ -lpthread -lm
 
 PBFLAGS = -I $(PROTOBUF_ROOT)/include -I $(PHXRPC_ROOT)
