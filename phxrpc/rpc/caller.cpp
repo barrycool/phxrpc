@@ -135,6 +135,72 @@ int Caller::Call(const google::protobuf::Message &req,
 
     return ret;
 }
+  
+int Caller::Call(const google::protobuf::MessageLite &req,
+                 google::protobuf::MessageLite *resp) {
+    auto msg_handler(msg_handler_factory_.Create());
+    BaseRequest *tmp_req{nullptr};
+    int ret{msg_handler->GenRequest(tmp_req)};
+    if (0 != ret || !tmp_req) {
+        log(LOG_ERR, "GenRequest err %d", ret);
+
+        return -1;
+    }
+    req_.reset(tmp_req);
+
+    ret = req_->FromPb(req);
+    if (0 != ret) {
+        log(LOG_ERR, "FromPb err %d", ret);
+
+        return ret;
+    }
+
+    req_->set_uri(uri_.c_str());
+    req_->set_keep_alive(keep_alive_);
+
+    bool send_error{false}, recv_error{false};
+    uint64_t call_begin{Timer::GetSteadyClockMS()};
+    ret = req_->Send(socket_);
+    if (0 != ret && SocketStreamError_Normal_Closed != ret) {
+        send_error = true;
+        log(LOG_ERR, "Send err %d", ret);
+    }
+
+    if (0 == ret) {
+        BaseResponse *tmp_resp{nullptr};
+        ret = msg_handler->RecvResponse(socket_, tmp_resp);
+        if ((0 != ret && SocketStreamError_Normal_Closed != ret) || !tmp_resp) {
+            recv_error = true;
+            log(LOG_ERR, "RecvResponse err %d", ret);
+        }
+        resp_.reset(tmp_resp);
+    }
+    MonitorReport(client_monitor_, send_error,
+                  recv_error, req_->size(),
+                  resp_ ? resp_->size() : 0, call_begin,
+                  Timer::GetSteadyClockMS());
+
+    if (0 != ret) {
+        log(LOG_ERR, "call err %d", ret);
+
+        return ret;
+    }
+
+    ret = resp_->ToPb(resp);
+    if (0 != ret) {
+        log(LOG_ERR, "ToPb err %d", ret);
+
+        return ret;
+    }
+
+    ret = resp_->result();
+    if (0 > ret) {
+        log(LOG_ERR, "call %s err %d", req_->uri(), ret);
+    }
+
+    return ret;
+}
+
 
 void Caller::set_uri(const char *const uri, const int cmd_id) {
     cmd_id_ = cmd_id;
