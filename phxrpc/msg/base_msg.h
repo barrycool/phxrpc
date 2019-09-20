@@ -33,6 +33,7 @@ namespace google {
 namespace protobuf {
 
 class Message;
+class MessageLite;
 
 }  // protobuf
 
