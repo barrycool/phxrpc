@@ -338,15 +338,15 @@ CLI_OBJS = $MessageFile$.o \
 		$ClientFile$.o \
 		$StubFile$.o
 
-TARGETS = lib$ClientFile$.a $ServerMainFile$ $ToolMainFile$
+TARGETS = lib$ClientFile$.so $ServerMainFile$ $ToolMainFile$
 
 all: $(TARGETS)
 
 $ServerMainFile$: $(SVR_OBJS)
 	$(LINKER) $^ $(LDFLAGS) -o $@
 
-lib$ClientFile$.a: $(CLI_OBJS)
-	$(AR) $@ $^
+lib$ClientFile$.so: $(CLI_OBJS)
+	$(LINKER) -shared -o $@ $^
 
 $ToolMainFile$: $ToolFile$.o $ToolImplFile$.o $ToolMainFile$.o
 	$(LINKER) $^ -L. -l$ClientFile$ $(LDFLAGS) -o $@

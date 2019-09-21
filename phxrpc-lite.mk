@@ -36,10 +36,11 @@ RM = /bin/rm -f
 
 CFLAGS = -std=c++11 -Wall -D_REENTRANT -D_GNU_SOURCE -D_XOPEN_SOURCE -fPIC -m64 $(OPT) \
 		-I$(PROTOBUF_ROOT)/include \
-		-I$(PHXRPC_ROOT)
+		-I$(PHXRPC_ROOT) \
+                -ffunction-sections -fdata-sections
 
-LDFLAGS = -L$(PROTOBUF_ROOT)/lib/ $(PROTOBUF_ROOT)/lib/libprotobuf-lite.a \
-		-lstdc++ -lpthread -lm
+LDFLAGS = -L$(PROTOBUF_ROOT)/lib/ -l protobuf-lite \
+		-lstdc++ -lpthread -lm -Wl,--gc-sections
 
 PBFLAGS = -I $(PROTOBUF_ROOT)/include -I $(PHXRPC_ROOT)
 
