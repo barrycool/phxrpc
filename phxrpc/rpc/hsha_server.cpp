@@ -782,7 +782,11 @@ HshaServerAcceptor::~HshaServerAcceptor() {
 
 void HshaServerAcceptor::LoopAccept(const char *const bind_ip, const int port) {
     int listen_fd{-1};
+    #if (USE_DOMAIN_SOCKET == 1)
+    if (!BlockDomainSocketUtils::Listen(&listen_fd, bind_ip, port)) {
+    #else
     if (!BlockTcpUtils::Listen(&listen_fd, bind_ip, port)) {
+    #endif
         printf("listen %s:%d err\n", bind_ip, port);
         exit(-1);
     }

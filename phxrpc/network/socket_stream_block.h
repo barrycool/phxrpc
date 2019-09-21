@@ -74,5 +74,20 @@ public:
     static int Poll(int fd, int events, int * revents, int timeout_ms);
 };
 
+class BlockDomainSocketUtils {
+public:
+    static bool Open(BlockTcpStream * stream, const char * ip, unsigned short port, int connect_timeout_ms,
+                     const char * bind_addr, int bind_port);
+
+    static bool Listen(int * listenfd, const char * ip, unsigned short port);
+
+    /**
+     * return > 0 : how many events
+     * return 0 : timeout,
+     * return -1 : error, and errno is set appropriately
+     */
+    static int Poll(int fd, int events, int * revents, int timeout_ms);
+};
+
 }
 

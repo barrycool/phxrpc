@@ -35,6 +35,9 @@ See the AUTHORS file for names of contributors.
 #include <string.h>
 #include <assert.h>
 
+#include <sys/un.h>  
+#include <stddef.h>  
+
 #include "socket_stream_block.h"
 #include "phxrpc/file/log_utils.h"
 
@@ -263,6 +266,114 @@ int BlockTcpUtils::Poll(int fd, int events, int * revents, int timeout_ms) {
     *revents = pfd.revents;
 
     return ret;
+}
+
+
+/////////////////////////////////////////////////////////////
+//
+bool BlockDomainSocketUtils::Open(BlockTcpStream * stream, const char * ip, unsigned short port, int connect_timeout_ms,
+                    const char * bind_addr, int bind_port) {
+
+    int sockfd = socket(AF_UNIX, SOCK_STREAM, 0);
+
+    if (sockfd < 0) {
+        phxrpc::log(LOG_WARNING, "TcpSocket::Connect().socket()=%d", sockfd);
+        return false;
+    }
+
+    struct sockaddr_un in_addr;
+    memset(&in_addr, 0, sizeof(in_addr));
+    in_addr.sun_family = AF_UNIX;
+
+    char * client_socket_file_name = tempnam("/tmp", "phxc_");
+    //printf("%s\n", client_socket_file_name);
+    strcpy(in_addr.sun_path, client_socket_file_name);
+    free(client_socket_file_name);
+    unlink(in_addr.sun_path);
+    if (bind(sockfd, (struct sockaddr *) &in_addr, offsetof(struct sockaddr_un, sun_path) + strlen(in_addr.sun_path)) < 0) {
+	    phxrpc::log(LOG_WARNING, "WARN: bind( %d, %s, ... ) fail", sockfd, bind_addr);
+    }
+    unlink(in_addr.sun_path);
+
+    strcpy(in_addr.sun_path, ip);
+
+    BaseTcpUtils::SetNonBlock(sockfd, true);
+
+    int error = 0;
+    int ret = connect(sockfd, (struct sockaddr*) &in_addr, offsetof(struct sockaddr_un, sun_path) + strlen(in_addr.sun_path));
+
+    if (0 != ret && ((errno != EINPROGRESS) && (errno != EAGAIN))) {
+        phxrpc::log(LOG_ERR, "connect(%d{%s:%d}) errno %d, %s", sockfd, ip, port, errno, strerror(errno));
+        error = -1;
+    }
+
+    if (0 == error && 0 != ret) {
+        int revents = 0;
+
+        ret = BlockTcpUtils::Poll(sockfd, POLLOUT, &revents, connect_timeout_ms);
+        if ((POLLOUT & revents)) {
+            socklen_t len = sizeof(error);
+            if (getsockopt(sockfd, SOL_SOCKET, SO_ERROR, (char*) &error, &len) < 0) {
+                phxrpc::log(LOG_ERR, "Socket(%d)::connectNonblock().getsockopt() < 0", sockfd);
+                error = -1;
+            }
+        } else {
+            //phxrpc::log(LOG_ERR, "Socket(%d)::connectNonblock().poll()=%d, revents=%d", sockfd, ret, revents);
+            error = -1;
+        }
+    }
+
+    if (0 == error) {
+        if (BaseTcpUtils::SetNonBlock(sockfd, false)) {
+            stream->Attach(sockfd);
+        } else {
+            phxrpc::log(LOG_ERR, "set nonblock fail");
+            error = -1;
+            close(sockfd);
+        }
+    } else {
+        close(sockfd);
+    }
+    return 0 == error;
+}
+
+bool BlockDomainSocketUtils::Listen(int * listenfd, const char * ip, unsigned short port) {
+    int sockfd = socket(AF_UNIX, SOCK_STREAM, 0);
+    if (sockfd < 0) {
+        phxrpc::log(LOG_WARNING, "socket failed, errno %d, %s", errno, strerror(errno));
+        return false;
+    }
+
+    int ret = 0;
+
+    struct sockaddr_un addr;
+
+    memset(&addr, 0, sizeof(addr));
+    addr.sun_family = AF_UNIX;
+    strcpy(addr.sun_path, ip);
+    
+    unlink(addr.sun_path);
+    if (bind(sockfd, (struct sockaddr*) &addr, offsetof(struct sockaddr_un, sun_path) + strlen(addr.sun_path)) < 0) {
+        phxrpc::log(LOG_CRIT, "bind failed, errno %d, %s", errno, strerror(errno));
+        ret = -1;
+    }
+
+    if (0 == ret) {
+        if (listen(sockfd, 10) < 0) {
+            phxrpc::log(LOG_CRIT, "listen failed, errno %d, %s", errno, strerror(errno));
+            ret = -1;
+        }
+    }
+
+    if (0 != ret && sockfd >= 0)
+        close(sockfd);
+
+    if (0 == ret) {
+        *listenfd = sockfd;
+        phxrpc::log(LOG_NOTICE, "Listen on port [%d]", port);
+    }
+
+    return 0 == ret;
 }
 
 }  //namespace phxrpc

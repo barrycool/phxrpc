@@ -29,8 +29,13 @@ bool PhxrpcTcpUtils::Open(BlockTcpStream *stream, const char *ip,
                           unsigned short port, int connect_timeout_ms,
                           const char *bind_addr, int bind_port,
                           ClientMonitor &client_monitor) {
+    #if (USE_DOMAIN_SOCKET == 1)
+    bool ret = BlockDomainSocketUtils::Open(stream, ip, port, connect_timeout_ms,
+                                   bind_addr, bind_port);
+    #else
     bool ret = BlockTcpUtils::Open(stream, ip, port, connect_timeout_ms,
                                    bind_addr, bind_port);
+    #endif
     client_monitor.ClientConnect(ret);
 
     return ret;

@@ -269,13 +269,13 @@ const char *PHXRPC_EPOLL_SERVER_ETC_TEMPLATE =
         R"(
 
 [Server]
-BindIP = 127.0.0.1
+BindIP = $PbPackageName$_server.socket
 Port = 16161
-MaxThreads = 16
-IOThreadCount = 3
+MaxThreads = 2
+IOThreadCount = 2
 PackageName = $PbPackageName$
-MaxConnections = 800000
-MaxQueueLength = 20480
+MaxConnections = 10
+MaxQueueLength = 30
 FastRejectThresholdMS = 20
 FastRejectAdjustRate = 5
 

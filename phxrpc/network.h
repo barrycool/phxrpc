@@ -21,6 +21,8 @@ See the AUTHORS file for names of contributors.
 
 #pragma once
 
+#define USE_DOMAIN_SOCKET 1
+
 #include "network/socket_stream_base.h"
 #include "network/socket_stream_block.h"
 #include "network/socket_stream_uthread.h"

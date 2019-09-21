@@ -267,15 +267,11 @@ ConnectTimeoutMS = 100
 SocketTimeoutMS = 30000
 
 [Server]
-ServerCount = 2
+ServerCount = 1
 PackageName = $PbPackageName$
 
 [Server0]
-IP = 127.0.0.1
-Port = 16161
-
-[Server1]
-IP = 127.0.0.1
+IP = $PbPackageName$_server.socket
 Port = 16161
 
 )";

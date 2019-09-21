@@ -287,7 +287,11 @@ void ToolCodeRender::GenerateToolImplCpp(SyntaxTree *stree, FILE *write) {
         fprintf(write, "    %s client;\n", client_class);
         fprintf(write, "    int ret{client.%s(req, &resp)};\n", fit->GetName());
         fprintf(write, "    printf(\"%%s return %%d\\n\", __func__, ret);\n");
-        fprintf(write, "    printf(\"resp: {\\n%%s}\\n\", resp.DebugString().c_str());\n");
+        if (0 == strcmp("PHXEcho", fit->GetName())) {
+            fprintf(write, "    printf(\"resp: {\\n%%s}\\n\", resp.value().c_str());\n");
+        } else {
+            fprintf(write, "    printf(\"resp: {\\n%%s}\\n\", resp.DebugString().c_str());\n");
+        }
         fprintf(write, "\n");
         fprintf(write, "    return ret;\n");
         fprintf(write, "}\n");
