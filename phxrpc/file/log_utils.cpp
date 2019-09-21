@@ -31,10 +31,12 @@ namespace phxrpc {
 static openlog_t global_openlog_ = NULL;
 static closelog_t global_closelog_ = ::closelog;
 static vlog_t global_vlog_ = vsyslog;
+
 static int global_priority_ = LOG_ERR;
 
 void openlog(const char *argv0, const char *log_dir, int priority) {
 
+    /*
     char new_path[ 1024 ] = { 0 };
     if( '~' == log_dir[0] ) {
         snprintf( new_path, sizeof( new_path ), "%s%s", getenv( "HOME" ), log_dir + 1 );
@@ -48,10 +50,11 @@ void openlog(const char *argv0, const char *log_dir, int priority) {
     } else {
         ::openlog( argv0, LOG_CONS | LOG_PID, priority );
     }
+    */
 }
 
 void closelog() {
-    global_closelog_();
+    //global_closelog_();
 }
 
 void log(int priority, const char *format, ...) {
@@ -60,8 +63,9 @@ void log(int priority, const char *format, ...) {
 
     va_list args;
     va_start(args, format);
-    global_vlog_(priority, format, args);
+    vprintf(format, args);
     va_end(args);
+    printf("\n");
 }
 
 void setvlog(vlog_t vlog) {
