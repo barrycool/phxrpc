@@ -338,7 +338,7 @@ CLI_OBJS = $MessageFile$.o \
 		$ClientFile$.o \
 		$StubFile$.o
 
-TARGETS = lib$ClientFile$.so $ServerMainFile$ $ToolMainFile$
+TARGETS = lib$ClientFile$.so $ServerMainFile$
 
 all: $(TARGETS)
 
@@ -347,9 +347,6 @@ $ServerMainFile$: $(SVR_OBJS)
 
 lib$ClientFile$.so: $(CLI_OBJS)
 	$(LINKER) -shared -o $@ $^
-
-$ToolMainFile$: $ToolFile$.o $ToolImplFile$.o $ToolMainFile$.o
-	$(LINKER) $^ -L. -l$ClientFile$ $(LDFLAGS) -o $@
 
 ########## message ##########
 
@@ -379,18 +376,6 @@ $DispatcherFile$.o: $ServiceFile$.h
 
 $ServiceFile$.h: $ProtoFile$
 	$(PHXRPC_ROOT)/codegen/phxrpc_pb2service $(PBFLAGS) -f $^ -d .
-
-########## tool ##########
-
-$ToolFile$.cpp: $ToolFile$.h
-$ToolFile$.o: $ToolFile$.h
-$ToolImplFile$.cpp: $ToolFile$.h
-$ToolImplFile$.o: $ToolFile$.h
-$ToolMainFile$.cpp: $ToolFile$.h
-$ToolMainFile$.o: $ToolFile$.h
-
-$ToolFile$.h: $ProtoFile$
-	$(PHXRPC_ROOT)/codegen/phxrpc_pb2tool $(PBFLAGS) -f $^ -d .
 
 clean:
 	@($(RM) $(TARGETS))
